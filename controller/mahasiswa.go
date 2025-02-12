@@ -1,60 +1,65 @@
 package controller
 
 import (
-	"fmt"
-	"net/http"
-
-	"go-rest-crud/database"
 	"go-rest-crud/models"
+	"go-rest-crud/services"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetMahasiswa(c *gin.Context) {
-	var mahasiswa []models.Mahasiswa
-	database.DB.Find(&mahasiswa)
+	mahasiswa, err := services.GetMahasiswaList()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mendapatkan data mahasiswa"})
+		return
+	}
+	c.JSON(http.StatusOK, mahasiswa)
+}
+
+func GetMahasiswaByID(c *gin.Context) {
+	id := c.Param("id")
+	mahasiswa, err := services.GetMahasiswaDetail(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Mahasiswa tidak ditemukan"})
+		return
+	}
 	c.JSON(http.StatusOK, mahasiswa)
 }
 
 func CreateMahasiswa(c *gin.Context) {
 	var mahasiswa models.Mahasiswa
-	c.BindJSON(&mahasiswa)
-	err := database.DB.Create(&mahasiswa)
-	if err.Error != nil {
-		fmt.Println(err.Error)
+	if err := c.ShouldBindJSON(&mahasiswa); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data tidak valid"})
+		return
+	}
+
+	if err := services.AddMahasiswa(&mahasiswa); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan mahasiswa"})
+		return
 	}
 	c.JSON(http.StatusCreated, mahasiswa)
 }
 
-func GetMahasiswaByID(c *gin.Context) {
-	var mahasiswa models.Mahasiswa
-	id := c.Param("id")
-	if err := database.DB.Where("id = ?", id).First(&mahasiswa).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Data mahasiswa tidak ditemukan"})
-		return
-	}
-	c.JSON(http.StatusOK, mahasiswa)
-}
-
 func UpdateMahasiswa(c *gin.Context) {
 	var mahasiswa models.Mahasiswa
-	id := c.Param("id")
-	if err := database.DB.Where("id = ?", id).First(&mahasiswa).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Data mahasiswa tidak ditemukan"})
+	if err := c.ShouldBindJSON(&mahasiswa); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data tidak valid"})
 		return
 	}
-	c.BindJSON(&mahasiswa)
-	database.DB.Save(&mahasiswa)
+
+	if err := services.ModifyMahasiswa(&mahasiswa); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memperbarui mahasiswa"})
+		return
+	}
 	c.JSON(http.StatusOK, mahasiswa)
 }
 
 func DeleteMahasiswa(c *gin.Context) {
-	var mahasiswa models.Mahasiswa
 	id := c.Param("id")
-	if err := database.DB.Where("id = ?", id).First(&mahasiswa).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Data mahasiswa tidak ditemukan"})
+	if err := services.RemoveMahasiswa(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus mahasiswa"})
 		return
 	}
-	database.DB.Delete(&mahasiswa)
-	c.JSON(http.StatusOK, gin.H{"message": "Data mahasiswa berhasil dihapus"})
+	c.JSON(http.StatusOK, gin.H{"message": "Mahasiswa berhasil dihapus"})
 }
