@@ -1,4 +1,4 @@
-module github.com/MFRDS/go-rest-crud
+module go-rest-crud
 
 go 1.23.5
 

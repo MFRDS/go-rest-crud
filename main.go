@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/MFRDS/go-rest-crud/database"
-	"github.com/MFRDS/go-rest-crud/routes"
+	"go-rest-crud/database"
+	"go-rest-crud/routes"
 )
 
 func main() {

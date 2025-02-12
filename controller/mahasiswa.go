@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/MFRDS/go-rest-crud/database"
-	"github.com/MFRDS/go-rest-crud/models"
+	"go-rest-crud/database"
+	"go-rest-crud/models"
+
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"github.com/MFRDS/go-rest-crud/controller"
+	"go-rest-crud/controller"
+
 	"github.com/gin-gonic/gin"
 )
 
