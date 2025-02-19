@@ -1,20 +1,22 @@
 package routes
 
 import (
-	"go-rest-crud/controller"
+	"go-rest-crud/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
-
+func SetupRouter(mahasiswaController *controllers.MahasiswaController) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/mahasiswa", controller.GetMahasiswa)
-	r.POST("/mahasiswa", controller.CreateMahasiswa)
-	r.GET("/mahasiswa/:id", controller.GetMahasiswaByID)
-	r.PUT("/mahasiswa/:id", controller.UpdateMahasiswa)
-	r.DELETE("/mahasiswa/:id", controller.DeleteMahasiswa)
+	mahasiswaRoutes := r.Group("/mahasiswa")
+	{
+		mahasiswaRoutes.GET("", mahasiswaController.GetAll)
+		mahasiswaRoutes.GET("/:id", mahasiswaController.GetByID)
+		mahasiswaRoutes.POST("", mahasiswaController.Create)
+		mahasiswaRoutes.PUT("", mahasiswaController.Update)
+		mahasiswaRoutes.DELETE("/:id", mahasiswaController.Delete)
+	}
 
 	return r
 }

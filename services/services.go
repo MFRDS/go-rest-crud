@@ -5,22 +5,38 @@ import (
 	"go-rest-crud/repository"
 )
 
-func GetMahasiswaList() ([]models.Mahasiswa, error) {
-	return repository.GetAllMahasiswa()
+type MahasiswaService interface {
+	GetAll() ([]models.Mahasiswa, error)
+	GetByID(id int) (models.Mahasiswa, error)
+	Create(mahasiswa models.Mahasiswa) error
+	Update(mahasiswa models.Mahasiswa) error
+	Delete(id int) error
 }
 
-func GetMahasiswaDetail(id string) (models.Mahasiswa, error) {
-	return repository.GetMahasiswaByID(id)
+type mahasiswaService struct {
+	repo repository.MahasiswaRepository
 }
 
-func AddMahasiswa(mahasiswa *models.Mahasiswa) error {
-	return repository.CreateMahasiswa(mahasiswa)
+func NewMahasiswaService(repo repository.MahasiswaRepository) MahasiswaService {
+	return &mahasiswaService{repo: repo}
 }
 
-func ModifyMahasiswa(mahasiswa *models.Mahasiswa) error {
-	return repository.UpdateMahasiswa(mahasiswa)
+func (s *mahasiswaService) GetAll() ([]models.Mahasiswa, error) {
+	return s.repo.GetAll()
 }
 
-func RemoveMahasiswa(id string) error {
-	return repository.DeleteMahasiswa(id)
+func (s *mahasiswaService) GetByID(id int) (models.Mahasiswa, error) {
+	return s.repo.GetByID(id)
+}
+
+func (s *mahasiswaService) Create(mahasiswa models.Mahasiswa) error {
+	return s.repo.Create(mahasiswa)
+}
+
+func (s *mahasiswaService) Update(mahasiswa models.Mahasiswa) error {
+	return s.repo.Update(mahasiswa)
+}
+
+func (s *mahasiswaService) Delete(id int) error {
+	return s.repo.Delete(id)
 }

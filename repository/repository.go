@@ -5,30 +5,40 @@ import (
 	"go-rest-crud/models"
 )
 
-func GetAllMahasiswa() ([]models.Mahasiswa, error) {
+type MahasiswaRepository interface {
+	GetAll() ([]models.Mahasiswa, error)
+	GetByID(id int) (models.Mahasiswa, error)
+	Create(mahasiswa models.Mahasiswa) error
+	Update(mahasiswa models.Mahasiswa) error
+	Delete(id int) error
+}
+
+type mahasiswaRepository struct{}
+
+func NewMahasiswaRepository() MahasiswaRepository {
+	return &mahasiswaRepository{}
+}
+
+func (r *mahasiswaRepository) GetAll() ([]models.Mahasiswa, error) {
 	var mahasiswa []models.Mahasiswa
-	result := database.DB.Find(&mahasiswa)
-	return mahasiswa, result.Error
+	err := database.DB.Find(&mahasiswa).Error
+	return mahasiswa, err
 }
 
-func GetMahasiswaByID(id string) (models.Mahasiswa, error) {
+func (r *mahasiswaRepository) GetByID(id int) (models.Mahasiswa, error) {
 	var mahasiswa models.Mahasiswa
-	result := database.DB.Where("id = ?", id).First(&mahasiswa)
-	return mahasiswa, result.Error
+	err := database.DB.First(&mahasiswa, id).Error
+	return mahasiswa, err
 }
 
-func CreateMahasiswa(mahasiswa *models.Mahasiswa) error {
-	return database.DB.Create(mahasiswa).Error
+func (r *mahasiswaRepository) Create(mahasiswa models.Mahasiswa) error {
+	return database.DB.Create(&mahasiswa).Error
 }
 
-func UpdateMahasiswa(mahasiswa *models.Mahasiswa) error {
-	return database.DB.Save(mahasiswa).Error
+func (r *mahasiswaRepository) Update(mahasiswa models.Mahasiswa) error {
+	return database.DB.Save(&mahasiswa).Error
 }
 
-func DeleteMahasiswa(id string) error {
-	var mahasiswa models.Mahasiswa
-	if err := database.DB.Where("id = ?", id).First(&mahasiswa).Error; err != nil {
-		return err
-	}
-	return database.DB.Delete(&mahasiswa).Error
+func (r *mahasiswaRepository) Delete(id int) error {
+	return database.DB.Delete(&models.Mahasiswa{}, id).Error
 }
